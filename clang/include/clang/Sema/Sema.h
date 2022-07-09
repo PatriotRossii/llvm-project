@@ -4968,6 +4968,7 @@ public:
   StmtResult ActOnForStmt(SourceLocation ForLoc,
                           SourceLocation LParenLoc,
                           Stmt *First,
+                          ArrayRef<Stmt *> FirstVec,
                           ConditionResult Second,
                           FullExprArg Third,
                           SourceLocation RParenLoc,

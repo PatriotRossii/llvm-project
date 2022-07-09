@@ -1021,6 +1021,9 @@ void CodeGenFunction::EmitForStmt(const ForStmt &S,
   // Evaluate the first part before the loop.
   if (S.getInit())
     EmitStmt(S.getInit());
+  for (unsigned i = 0, e = S.getNumInits(); i != e; ++i) {
+    EmitStmt(S.getInit(i));
+  }
 
   // Start the loop with a block that tests the condition.
   // If there's an increment, the continue scope will be overwritten

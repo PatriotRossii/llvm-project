@@ -218,7 +218,10 @@ void ASTStmtWriter::VisitDoStmt(DoStmt *S) {
 
 void ASTStmtWriter::VisitForStmt(ForStmt *S) {
   VisitStmt(S);
+  Record.push_back(S->getNumInits());
   Record.AddStmt(S->getInit());
+  for (unsigned i = 0, e = S->getNumInits(); i != e; ++i)
+    Record.AddStmt(S->getInit(i));
   Record.AddStmt(S->getCond());
   Record.AddDeclRef(S->getConditionVariable());
   Record.AddStmt(S->getInc());

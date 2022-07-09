@@ -1957,7 +1957,10 @@ StmtResult Parser::ParseForStatement(SourceLocation *TrailingElseLoc) {
   ExprResult Value;
 
   bool ForEach = false;
+
   StmtResult FirstPart;
+  StmtVector FirstPartVec;
+
   Sema::ConditionResult SecondPart;
   ExprResult Collection;
   ForRangeInfo ForRangeInfo;
@@ -2035,6 +2038,21 @@ StmtResult Parser::ParseForStatement(SourceLocation *TrailingElseLoc) {
         FirstPart = StmtResult();
       } else if (Tok.is(tok::semi)) { // for (int x = 4;
         ConsumeToken();
+
+        while(isForInitDeclaration()) {
+          SourceLocation DeclStart = Tok.getLocation(), DeclEnd;
+          ParsedAttributes attrs(AttrFactory);
+          ParsedAttributes DeclSpecAttrs(AttrFactory);
+
+          DeclGroupPtrTy DG = ParseSimpleDeclaration(
+              DeclaratorContext::ForInit, DeclEnd, attrs, DeclSpecAttrs, false, nullptr
+          );
+          StmtResult R = Actions.ActOnDeclStmt(DG, DeclStart, Tok.getLocation());
+
+          ExpectAndConsumeSemi(diag::err_expected_semi_for);
+          if(R.isUsable())
+            FirstPartVec.push_back(R.get());
+        }
       } else if ((ForEach = isTokIdentifier_in())) {
         Actions.ActOnForEachDeclStmt(DG);
         // ObjC: for (id x in expr)
@@ -2265,8 +2283,8 @@ StmtResult Parser::ParseForStatement(SourceLocation *TrailingElseLoc) {
     return Actions.FinishCXXForRangeStmt(ForRangeStmt.get(), Body.get());
 
   return Actions.ActOnForStmt(ForLoc, T.getOpenLocation(), FirstPart.get(),
-                              SecondPart, ThirdPart, T.getCloseLocation(),
-                              Body.get());
+                              FirstPartVec, SecondPart, ThirdPart,
+                              T.getCloseLocation(), Body.get());
 }
 
 /// ParseGotoStatement

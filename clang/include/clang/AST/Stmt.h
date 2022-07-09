@@ -2563,20 +2563,42 @@ public:
 /// ForStmt - This represents a 'for (init;cond;inc)' stmt.  Note that any of
 /// the init/cond/inc parts of the ForStmt will be null if they were not
 /// specified in the source.
-class ForStmt : public Stmt {
+class ForStmt final : public Stmt,
+                      private llvm::TrailingObjects<ForStmt, Stmt *> {
+  friend TrailingObjects;
+  friend class ASTStmtReader;
+
+  unsigned NumInits;
+  size_t numTrailingObjects(OverloadToken<Stmt *>) const { return NumInits; }
+
   enum { INIT, CONDVAR, COND, INC, BODY, END_EXPR };
   Stmt* SubExprs[END_EXPR]; // SubExprs[INIT] is an expression or declstmt.
   SourceLocation LParenLoc, RParenLoc;
 
-public:
-  ForStmt(const ASTContext &C, Stmt *Init, Expr *Cond, VarDecl *condVar,
+  ForStmt(const ASTContext &C, Stmt *Init, ArrayRef<Stmt*> inits, Expr *Cond, VarDecl *condVar,
           Expr *Inc, Stmt *Body, SourceLocation FL, SourceLocation LP,
           SourceLocation RP);
+  ForStmt(EmptyShell Empty, unsigned numInits)
+    : Stmt(ForStmtClass), NumInits(numInits) { }
 
-  /// Build an empty for statement.
-  explicit ForStmt(EmptyShell Empty) : Stmt(ForStmtClass, Empty) {}
+  Stmt *const *getInits() const { return getTrailingObjects<Stmt *>(); }
+  Stmt **getInits() { return getTrailingObjects<Stmt *>(); }
+public:
+  static ForStmt *Create(const ASTContext &C, Stmt *Init, ArrayRef<Stmt*> inits, Expr *Cond, VarDecl *condVar,
+                        Expr *Inc, Stmt *Body, SourceLocation FL, SourceLocation LP,
+                        SourceLocation RP);
+  static ForStmt *Create(const ASTContext &C, EmptyShell Empty,
+                            unsigned numInits);
+
+  unsigned getNumInits() const { return NumInits; }
 
   Stmt *getInit() { return SubExprs[INIT]; }
+  Stmt *getInit(unsigned i) {
+    return getInits()[i];
+  }
+  const Stmt *getInit(unsigned i) const {
+    return getInits()[i];
+  }
 
   /// Retrieve the variable declared in this "for" statement, if any.
   ///

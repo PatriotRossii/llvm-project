@@ -1380,10 +1380,10 @@ public:
   /// By default, performs semantic analysis to build the new statement.
   /// Subclasses may override this routine to provide different behavior.
   StmtResult RebuildForStmt(SourceLocation ForLoc, SourceLocation LParenLoc,
-                            Stmt *Init, Sema::ConditionResult Cond,
+                            Stmt *Init, ArrayRef<Stmt *> Inits, Sema::ConditionResult Cond,
                             Sema::FullExprArg Inc, SourceLocation RParenLoc,
                             Stmt *Body) {
-    return getSema().ActOnForStmt(ForLoc, LParenLoc, Init, Cond,
+    return getSema().ActOnForStmt(ForLoc, LParenLoc, Init, Inits, Cond,
                                   Inc, RParenLoc, Body);
   }
 
@@ -7607,6 +7607,17 @@ TreeTransform<Derived>::TransformForStmt(ForStmt *S) {
   if (Init.isInvalid())
     return StmtError();
 
+  bool InitChanged = false;
+  SmallVector<Stmt *, 32> Inits;
+  for (unsigned I = 0, N = S->getNumInits(); I != N; ++I) {
+    StmtResult Init = getDerived().TransformStmt(S->getInit(I));
+    if (Init.isInvalid())
+      return StmtError();
+
+    InitChanged = InitChanged || Init.get() != S->getInit(I);
+    Inits.push_back(Init.getAs<Stmt>());
+  }
+
   // In OpenMP loop region loop control variable must be captured and be
   // private. Perform analysis of first part (if any).
   if (getSema().getLangOpts().OpenMP && Init.isUsable())
@@ -7637,11 +7648,11 @@ TreeTransform<Derived>::TransformForStmt(ForStmt *S) {
       Init.get() == S->getInit() &&
       Cond.get() == std::make_pair(S->getConditionVariable(), S->getCond()) &&
       Inc.get() == S->getInc() &&
-      Body.get() == S->getBody())
+      Body.get() == S->getBody() && !InitChanged)
     return S;
 
   return getDerived().RebuildForStmt(S->getForLoc(), S->getLParenLoc(),
-                                     Init.get(), Cond, FullInc,
+                                     Init.get(), Inits, Cond, FullInc,
                                      S->getRParenLoc(), Body.get());
 }
 

@@ -6487,6 +6487,16 @@ ExpectedStmt ASTNodeImporter::VisitForStmt(ForStmt *S) {
 
   Error Err = Error::success();
   auto ToInit = importChecked(Err, S->getInit());
+
+  SmallVector<Stmt *, 1> ToInits(S->getNumInits());
+  for (unsigned HI = 0, HE = S->getNumInits(); HI != HE; ++HI) {
+    Stmt *FromInit = S->getInit(HI);
+    if (auto ToInitOrErr = import(FromInit))
+      ToInits[HI] = *ToInitOrErr;
+    else
+      return ToInitOrErr.takeError();
+  }
+
   auto ToCond = importChecked(Err, S->getCond());
   auto ToConditionVariable = importChecked(Err, S->getConditionVariable());
   auto ToInc = importChecked(Err, S->getInc());
@@ -6497,9 +6507,9 @@ ExpectedStmt ASTNodeImporter::VisitForStmt(ForStmt *S) {
   if (Err)
     return std::move(Err);
 
-  return new (Importer.getToContext()) ForStmt(
+  return ForStmt::Create(
       Importer.getToContext(),
-      ToInit, ToCond, ToConditionVariable, ToInc, ToBody, ToForLoc, ToLParenLoc,
+      ToInit, ToInits, ToCond, ToConditionVariable, ToInc, ToBody, ToForLoc, ToLParenLoc,
       ToRParenLoc);
 }
 

@@ -395,8 +395,13 @@ void StmtPrinter::VisitDoStmt(DoStmt *Node) {
 
 void StmtPrinter::VisitForStmt(ForStmt *Node) {
   Indent() << "for (";
-  if (Node->getInit())
+  if (Node->getInit()) {
     PrintInitStmt(Node->getInit(), 5);
+
+    for (unsigned i = 0, e = Node->getNumInits(); i < e; ++i) {
+      PrintInitStmt(Node->getInit(i), 5);
+    }
+  }
   else
     OS << (Node->getCond() ? "; " : ";");
   if (Node->getCond())

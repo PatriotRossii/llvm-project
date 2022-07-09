@@ -296,7 +296,11 @@ void ASTStmtReader::VisitDoStmt(DoStmt *S) {
 
 void ASTStmtReader::VisitForStmt(ForStmt *S) {
   VisitStmt(S);
+  assert(Record.peekInt() == S->getNumInits() && "NumStmtFields is wrong ?");
+  Record.skipInts(1);
   S->setInit(Record.readSubStmt());
+  for (unsigned i = 0, e = S->getNumInits(); i != e; ++i)
+    S->getInits()[i] = Record.readSubStmt();
   S->setCond(Record.readSubExpr());
   S->setConditionVariable(Record.getContext(), readDeclAs<VarDecl>());
   S->setInc(Record.readSubExpr());
@@ -2823,7 +2827,8 @@ Stmt *ASTReader::ReadStmtFromStream(ModuleFile &F) {
       break;
 
     case STMT_FOR:
-      S = new (Context) ForStmt(Empty);
+      S = ForStmt::Create(Context, Empty,
+             /*numInits=*/Record[ASTStmtReader::NumStmtFields]);
       break;
 
     case STMT_GOTO:

@@ -8348,7 +8348,7 @@ private:
     }
 
     // Build 'for (...) ...'
-    return S.ActOnForStmt(Loc, Loc, Init,
+    return S.ActOnForStmt(Loc, Loc, Init, {},
                           S.ActOnCondition(nullptr, Loc, Cond.get(),
                                            Sema::ConditionKind::Boolean),
                           S.MakeFullDiscardedValueExpr(Inc.get()), Loc,
@@ -14294,7 +14294,7 @@ buildSingleCopyAssignRecursively(Sema &S, SourceLocation Loc, QualType T,
 
   // Construct the loop that copies all elements of this array.
   return S.ActOnForStmt(
-      Loc, Loc, InitStmt,
+      Loc, Loc, InitStmt, {},
       S.ActOnCondition(nullptr, Loc, Comparison, Sema::ConditionKind::Boolean),
       S.MakeFullDiscardedValueExpr(Increment), Loc, Copy.get());
 }

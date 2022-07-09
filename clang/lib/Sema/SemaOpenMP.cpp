@@ -14682,10 +14682,9 @@ StmtResult Sema::ActOnOpenMPTileDirective(ArrayRef<OMPClause *> Clauses,
     BodyParts.push_back(Inner);
     Inner = CompoundStmt::Create(Context, BodyParts, FPOptionsOverride(),
                                  Inner->getBeginLoc(), Inner->getEndLoc());
-    Inner = new (Context)
-        ForStmt(Context, InitStmt.get(), CondExpr.get(), nullptr,
-                IncrStmt.get(), Inner, LoopHelper.Init->getBeginLoc(),
-                LoopHelper.Init->getBeginLoc(), LoopHelper.Inc->getEndLoc());
+    Inner = ForStmt::Create(Context, InitStmt.get(), {}, CondExpr.get(), nullptr,
+                            IncrStmt.get(), Inner, LoopHelper.Init->getBeginLoc(),
+                            LoopHelper.Init->getBeginLoc(), LoopHelper.Inc->getEndLoc());
   }
 
   // Create floor loops from the inside to the outside.
@@ -14725,10 +14724,9 @@ StmtResult Sema::ActOnOpenMPTileDirective(ArrayRef<OMPClause *> Clauses,
     if (!IncrStmt.isUsable())
       return StmtError();
 
-    Inner = new (Context)
-        ForStmt(Context, InitStmt.get(), CondExpr.get(), nullptr,
-                IncrStmt.get(), Inner, LoopHelper.Init->getBeginLoc(),
-                LoopHelper.Init->getBeginLoc(), LoopHelper.Inc->getEndLoc());
+    Inner = ForStmt::Create(Context, InitStmt.get(), {}, CondExpr.get(), nullptr,
+                            IncrStmt.get(), Inner, LoopHelper.Init->getBeginLoc(),
+                            LoopHelper.Init->getBeginLoc(), LoopHelper.Inc->getEndLoc());
   }
 
   return OMPTileDirective::Create(Context, StartLoc, EndLoc, Clauses, NumLoops,
@@ -14958,10 +14956,9 @@ StmtResult Sema::ActOnOpenMPUnrollDirective(ArrayRef<OMPClause *> Clauses,
   CompoundStmt *InnerBody =
       CompoundStmt::Create(Context, InnerBodyStmts, FPOptionsOverride(),
                            Body->getBeginLoc(), Body->getEndLoc());
-  ForStmt *InnerFor = new (Context)
-      ForStmt(Context, InnerInit.get(), InnerCond.get(), nullptr,
-              InnerIncr.get(), InnerBody, LoopHelper.Init->getBeginLoc(),
-              LoopHelper.Init->getBeginLoc(), LoopHelper.Inc->getEndLoc());
+  ForStmt *InnerFor = ForStmt::Create(Context, InnerInit.get(), {}, InnerCond.get(), nullptr,
+                                      InnerIncr.get(), InnerBody, LoopHelper.Init->getBeginLoc(),
+                                      LoopHelper.Init->getBeginLoc(), LoopHelper.Inc->getEndLoc());
 
   // Unroll metadata for the inner loop.
   // This needs to take into account the remainder portion of the unrolled loop,
@@ -15005,10 +15002,9 @@ StmtResult Sema::ActOnOpenMPUnrollDirective(ArrayRef<OMPClause *> Clauses,
     return StmtError();
 
   // Outer For statement.
-  ForStmt *OuterFor = new (Context)
-      ForStmt(Context, OuterInit.get(), OuterConde.get(), nullptr,
-              OuterIncr.get(), InnerUnrolled, LoopHelper.Init->getBeginLoc(),
-              LoopHelper.Init->getBeginLoc(), LoopHelper.Inc->getEndLoc());
+  ForStmt *OuterFor = ForStmt::Create(Context, OuterInit.get(), {}, OuterConde.get(), nullptr,
+                                      OuterIncr.get(), InnerUnrolled, LoopHelper.Init->getBeginLoc(),
+                                      LoopHelper.Init->getBeginLoc(), LoopHelper.Inc->getEndLoc());
 
   return OMPUnrollDirective::Create(Context, StartLoc, EndLoc, Clauses, AStmt,
                                     NumGeneratedLoops, OuterFor,
