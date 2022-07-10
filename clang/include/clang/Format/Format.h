@@ -369,6 +369,17 @@ struct FormatStyle {
   /// \version 3.5
   OperandAlignmentStyle AlignOperands;
 
+  /// If ``true``, aligns requires clause bodies with `requires` keyword.
+  /// \code
+  ///   true:                                   false:
+  ///   template <typename T>                   template <typename T>
+  ///   concept C = requires(T t) {      vs.    concept C = requires(T t) {
+  ///                 ...                         ...
+  ///               }                           }
+  /// \endcode
+  /// \version 15
+  bool AlignRequiresClauseBody;
+
   /// If ``true``, aligns trailing comments.
   /// \code
   ///   true:                                   false:
@@ -3856,6 +3867,7 @@ struct FormatStyle {
            AlignConsecutiveMacros == R.AlignConsecutiveMacros &&
            AlignEscapedNewlines == R.AlignEscapedNewlines &&
            AlignOperands == R.AlignOperands &&
+           AlignRequiresClauseBody == R.AlignRequiresClauseBody &&
            AlignTrailingComments == R.AlignTrailingComments &&
            AllowAllArgumentsOnNextLine == R.AllowAllArgumentsOnNextLine &&
            AllowAllParametersOfDeclarationOnNextLine ==
