@@ -2039,18 +2039,19 @@ StmtResult Parser::ParseForStatement(SourceLocation *TrailingElseLoc) {
       } else if (Tok.is(tok::semi)) { // for (int x = 4;
         ConsumeToken();
 
-        while(isForInitDeclaration()) {
+        while (isForInitDeclaration()) {
           SourceLocation DeclStart = Tok.getLocation(), DeclEnd;
           ParsedAttributes attrs(AttrFactory);
           ParsedAttributes DeclSpecAttrs(AttrFactory);
 
-          DeclGroupPtrTy DG = ParseSimpleDeclaration(
-              DeclaratorContext::ForInit, DeclEnd, attrs, DeclSpecAttrs, false, nullptr
-          );
-          StmtResult R = Actions.ActOnDeclStmt(DG, DeclStart, Tok.getLocation());
+          DeclGroupPtrTy DG =
+              ParseSimpleDeclaration(DeclaratorContext::ForInit, DeclEnd, attrs,
+                                     DeclSpecAttrs, false, nullptr);
+          StmtResult R =
+              Actions.ActOnDeclStmt(DG, DeclStart, Tok.getLocation());
 
           ExpectAndConsumeSemi(diag::err_expected_semi_for);
-          if(R.isUsable())
+          if (R.isUsable())
             FirstPartVec.push_back(R.get());
         }
       } else if ((ForEach = isTokIdentifier_in())) {

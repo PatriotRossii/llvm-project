@@ -2129,9 +2129,9 @@ void Sema::CheckBreakContinueBinding(Expr *E) {
 }
 
 StmtResult Sema::ActOnForStmt(SourceLocation ForLoc, SourceLocation LParenLoc,
-                              Stmt *First, ArrayRef<Stmt *> FirstVec, ConditionResult Second,
-                              FullExprArg third, SourceLocation RParenLoc,
-                              Stmt *Body) {
+                              Stmt *First, ArrayRef<Stmt *> FirstVec,
+                              ConditionResult Second, FullExprArg third,
+                              SourceLocation RParenLoc, Stmt *Body) {
   if (Second.isInvalid())
     return StmtError();
 
@@ -2181,8 +2181,9 @@ StmtResult Sema::ActOnForStmt(SourceLocation ForLoc, SourceLocation LParenLoc,
   if (isa<NullStmt>(Body))
     getCurCompoundScope().setHasEmptyLoopBodies();
 
-  return ForStmt::Create(Context, First, FirstVec, Second.get().second, Second.get().first, Third,
-                        Body, ForLoc, LParenLoc, RParenLoc);
+  return ForStmt::Create(Context, First, FirstVec, Second.get().second,
+                         Second.get().first, Third, Body, ForLoc, LParenLoc,
+                         RParenLoc);
 }
 
 /// In an Objective C collection iteration statement:

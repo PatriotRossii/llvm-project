@@ -2575,30 +2575,28 @@ class ForStmt final : public Stmt,
   Stmt* SubExprs[END_EXPR]; // SubExprs[INIT] is an expression or declstmt.
   SourceLocation LParenLoc, RParenLoc;
 
-  ForStmt(const ASTContext &C, Stmt *Init, ArrayRef<Stmt*> inits, Expr *Cond, VarDecl *condVar,
-          Expr *Inc, Stmt *Body, SourceLocation FL, SourceLocation LP,
-          SourceLocation RP);
+  ForStmt(const ASTContext &C, Stmt *Init, ArrayRef<Stmt *> inits, Expr *Cond,
+          VarDecl *condVar, Expr *Inc, Stmt *Body, SourceLocation FL,
+          SourceLocation LP, SourceLocation RP);
   ForStmt(EmptyShell Empty, unsigned numInits)
-    : Stmt(ForStmtClass), NumInits(numInits) { }
+      : Stmt(ForStmtClass), NumInits(numInits) {}
 
   Stmt *const *getInits() const { return getTrailingObjects<Stmt *>(); }
   Stmt **getInits() { return getTrailingObjects<Stmt *>(); }
+
 public:
-  static ForStmt *Create(const ASTContext &C, Stmt *Init, ArrayRef<Stmt*> inits, Expr *Cond, VarDecl *condVar,
-                        Expr *Inc, Stmt *Body, SourceLocation FL, SourceLocation LP,
-                        SourceLocation RP);
+  static ForStmt *Create(const ASTContext &C, Stmt *Init,
+                         ArrayRef<Stmt *> inits, Expr *Cond, VarDecl *condVar,
+                         Expr *Inc, Stmt *Body, SourceLocation FL,
+                         SourceLocation LP, SourceLocation RP);
   static ForStmt *Create(const ASTContext &C, EmptyShell Empty,
-                            unsigned numInits);
+                         unsigned numInits);
 
   unsigned getNumInits() const { return NumInits; }
 
   Stmt *getInit() { return SubExprs[INIT]; }
-  Stmt *getInit(unsigned i) {
-    return getInits()[i];
-  }
-  const Stmt *getInit(unsigned i) const {
-    return getInits()[i];
-  }
+  Stmt *getInit(unsigned i) { return getInits()[i]; }
+  const Stmt *getInit(unsigned i) const { return getInits()[i]; }
 
   /// Retrieve the variable declared in this "for" statement, if any.
   ///

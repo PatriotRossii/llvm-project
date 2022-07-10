@@ -4965,14 +4965,10 @@ public:
                          SourceLocation WhileLoc, SourceLocation CondLParen,
                          Expr *Cond, SourceLocation CondRParen);
 
-  StmtResult ActOnForStmt(SourceLocation ForLoc,
-                          SourceLocation LParenLoc,
-                          Stmt *First,
-                          ArrayRef<Stmt *> FirstVec,
-                          ConditionResult Second,
-                          FullExprArg Third,
-                          SourceLocation RParenLoc,
-                          Stmt *Body);
+  StmtResult ActOnForStmt(SourceLocation ForLoc, SourceLocation LParenLoc,
+                          Stmt *First, ArrayRef<Stmt *> FirstVec,
+                          ConditionResult Second, FullExprArg Third,
+                          SourceLocation RParenLoc, Stmt *Body);
   ExprResult CheckObjCForCollectionOperand(SourceLocation forLoc,
                                            Expr *collection);
   StmtResult ActOnObjCForCollectionStmt(SourceLocation ForColLoc,

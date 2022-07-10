@@ -1015,25 +1015,27 @@ IfStmt::getNondiscardedCase(const ASTContext &Ctx) const {
   return None;
 }
 
-ForStmt *ForStmt::Create(const ASTContext &C, Stmt *Init, ArrayRef<Stmt*> inits, Expr *Cond, VarDecl *condVar,
-                        Expr *Inc, Stmt *Body, SourceLocation FL, SourceLocation LP, SourceLocation RP) {
+ForStmt *ForStmt::Create(const ASTContext &C, Stmt *Init,
+                         ArrayRef<Stmt *> inits, Expr *Cond, VarDecl *condVar,
+                         Expr *Inc, Stmt *Body, SourceLocation FL,
+                         SourceLocation LP, SourceLocation RP) {
   const size_t Size = totalSizeToAlloc<Stmt *>(inits.size() + 1);
   void *Mem = C.Allocate(Size, alignof(ForStmt));
-  return new (Mem) ForStmt(C, Init, inits, Cond, condVar, Inc, Body, FL, LP, RP);
+  return new (Mem)
+      ForStmt(C, Init, inits, Cond, condVar, Inc, Body, FL, LP, RP);
 }
 
 ForStmt *ForStmt::Create(const ASTContext &C, EmptyShell Empty,
-                               unsigned numHandlers) {
+                         unsigned numHandlers) {
   const size_t Size = totalSizeToAlloc<Stmt *>(numHandlers + 1);
   void *Mem = C.Allocate(Size, alignof(ForStmt));
   return new (Mem) ForStmt(Empty, numHandlers);
 }
 
-ForStmt::ForStmt(const ASTContext &C, Stmt *Init, ArrayRef<Stmt*> inits, Expr *Cond, VarDecl *condVar,
-                 Expr *Inc, Stmt *Body, SourceLocation FL, SourceLocation LP,
-                 SourceLocation RP)
-  : Stmt(ForStmtClass), LParenLoc(LP), RParenLoc(RP), NumInits(inits.size())
-{
+ForStmt::ForStmt(const ASTContext &C, Stmt *Init, ArrayRef<Stmt *> inits,
+                 Expr *Cond, VarDecl *condVar, Expr *Inc, Stmt *Body,
+                 SourceLocation FL, SourceLocation LP, SourceLocation RP)
+    : Stmt(ForStmtClass), LParenLoc(LP), RParenLoc(RP), NumInits(inits.size()) {
   SubExprs[INIT] = Init;
   setConditionVariable(C, condVar);
   SubExprs[COND] = Cond;

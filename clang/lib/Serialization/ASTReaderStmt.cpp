@@ -2828,7 +2828,7 @@ Stmt *ASTReader::ReadStmtFromStream(ModuleFile &F) {
 
     case STMT_FOR:
       S = ForStmt::Create(Context, Empty,
-             /*numInits=*/Record[ASTStmtReader::NumStmtFields]);
+                          /*numInits=*/Record[ASTStmtReader::NumStmtFields]);
       break;
 
     case STMT_GOTO:

@@ -401,8 +401,7 @@ void StmtPrinter::VisitForStmt(ForStmt *Node) {
     for (unsigned i = 0, e = Node->getNumInits(); i < e; ++i) {
       PrintInitStmt(Node->getInit(i), 5);
     }
-  }
-  else
+  } else
     OS << (Node->getCond() ? "; " : ";");
   if (Node->getCond())
     PrintExpr(Node->getCond());

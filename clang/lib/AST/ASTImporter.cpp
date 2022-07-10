@@ -6507,10 +6507,9 @@ ExpectedStmt ASTNodeImporter::VisitForStmt(ForStmt *S) {
   if (Err)
     return std::move(Err);
 
-  return ForStmt::Create(
-      Importer.getToContext(),
-      ToInit, ToInits, ToCond, ToConditionVariable, ToInc, ToBody, ToForLoc, ToLParenLoc,
-      ToRParenLoc);
+  return ForStmt::Create(Importer.getToContext(), ToInit, ToInits, ToCond,
+                         ToConditionVariable, ToInc, ToBody, ToForLoc,
+                         ToLParenLoc, ToRParenLoc);
 }
 
 ExpectedStmt ASTNodeImporter::VisitGotoStmt(GotoStmt *S) {

@@ -1380,11 +1380,11 @@ public:
   /// By default, performs semantic analysis to build the new statement.
   /// Subclasses may override this routine to provide different behavior.
   StmtResult RebuildForStmt(SourceLocation ForLoc, SourceLocation LParenLoc,
-                            Stmt *Init, ArrayRef<Stmt *> Inits, Sema::ConditionResult Cond,
-                            Sema::FullExprArg Inc, SourceLocation RParenLoc,
-                            Stmt *Body) {
-    return getSema().ActOnForStmt(ForLoc, LParenLoc, Init, Inits, Cond,
-                                  Inc, RParenLoc, Body);
+                            Stmt *Init, ArrayRef<Stmt *> Inits,
+                            Sema::ConditionResult Cond, Sema::FullExprArg Inc,
+                            SourceLocation RParenLoc, Stmt *Body) {
+    return getSema().ActOnForStmt(ForLoc, LParenLoc, Init, Inits, Cond, Inc,
+                                  RParenLoc, Body);
   }
 
   /// Build a new goto statement.
@@ -7644,11 +7644,9 @@ TreeTransform<Derived>::TransformForStmt(ForStmt *S) {
   if (Body.isInvalid())
     return StmtError();
 
-  if (!getDerived().AlwaysRebuild() &&
-      Init.get() == S->getInit() &&
+  if (!getDerived().AlwaysRebuild() && Init.get() == S->getInit() &&
       Cond.get() == std::make_pair(S->getConditionVariable(), S->getCond()) &&
-      Inc.get() == S->getInc() &&
-      Body.get() == S->getBody() && !InitChanged)
+      Inc.get() == S->getInc() && Body.get() == S->getBody() && !InitChanged)
     return S;
 
   return getDerived().RebuildForStmt(S->getForLoc(), S->getLParenLoc(),
