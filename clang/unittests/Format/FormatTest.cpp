@@ -24720,6 +24720,74 @@ TEST_F(FormatTest, RequiresClauses) {
                "bar(requires);");
 }
 
+TEST_F(FormatTest, AlignRequiresClauseBody) {
+  auto Style = getLLVMStyle();
+  EXPECT_EQ(Style.AlignRequiresClauseBody, true);
+
+  verifyFormat("template <typename T>\n"
+               "concept C = requires(T t) {\n"
+               "              typename T::value;\n"
+               "              requires requires(typename T::value v) {\n"
+               "                         { t == v } -> std::same_as<bool>;\n"
+               "                       };\n"
+               "            };",
+               Style);
+
+  verifyFormat(
+      "template <typename T>\n"
+      "void bar(T)\n"
+      "  requires Foo<T> && requires(T t) {\n"
+      "                       { t.foo() } -> std::same_as<int>;\n"
+      "                     } && requires(T t) {\n"
+      "                            { t.bar() } -> std::same_as<bool>;\n"
+      "                            --t;\n"
+      "                          };",
+      Style);
+
+  verifyFormat("template <typename T>\n"
+               "  requires Foo<T> &&\n"
+               "           requires(T t) {\n"
+               "             { t.foo() } -> std::same_as<int>;\n"
+               "           } && requires(T t) {\n"
+               "                  { t.bar() } -> std::same_as<bool>;\n"
+               "                  --t;\n"
+               "                }\n"
+               "void bar(T);",
+               Style);
+
+  Style.AlignRequiresClauseBody = false;
+
+  verifyFormat("template <typename T>\n"
+               "concept C = requires(T t) {\n"
+               "  typename T::value;\n"
+               "  requires requires(typename T::value v) {\n"
+               "    { t == v } -> std::same_as<bool>;\n"
+               "  };\n"
+               "};",
+               Style);
+
+  verifyFormat("template <typename T>\n"
+               "void bar(T)\n"
+               "  requires Foo<T> && requires(T t) {\n"
+               "    { t.foo() } -> std::same_as<int>;\n"
+               "  } && requires(T t) {\n"
+               "    { t.bar() } -> std::same_as<bool>;\n"
+               "    --t;\n"
+               "  };",
+               Style);
+
+  verifyFormat("template <typename T>\n"
+               "  requires Foo<T> &&\n"
+               "           requires(T t) {\n"
+               "             { t.foo() } -> std::same_as<int>;\n"
+               "           } && requires(T t) {\n"
+               "             { t.bar() } -> std::same_as<bool>;\n"
+               "             --t;\n"
+               "           }\n"
+               "void bar(T);",
+               Style);
+}
+
 TEST_F(FormatTest, StatementAttributeLikeMacros) {
   FormatStyle Style = getLLVMStyle();
   StringRef Source = "void Foo::slot() {\n"
