@@ -20033,7 +20033,6 @@ TEST_F(FormatTest, GetsCorrectBasedOnStyle) {
 TEST_F(FormatTest, ParsesConfigurationBools) {
   FormatStyle Style = {};
   Style.Language = FormatStyle::LK_Cpp;
-  CHECK_PARSE_BOOL(AlignRequiresClauseBody);
   CHECK_PARSE_BOOL(AlignTrailingComments);
   CHECK_PARSE_BOOL(AllowAllArgumentsOnNextLine);
   CHECK_PARSE_BOOL(AllowAllParametersOfDeclarationOnNextLine);
@@ -24720,9 +24719,9 @@ TEST_F(FormatTest, RequiresClauses) {
                "bar(requires);");
 }
 
-TEST_F(FormatTest, AlignRequiresClauseBody) {
+TEST_F(FormatTest, RequiresExpressionIndentation) {
   auto Style = getLLVMStyle();
-  EXPECT_EQ(Style.AlignRequiresClauseBody, true);
+  EXPECT_EQ(Style.RequiresExpressionIndentation, FormatStyle::REI_Keyword);
 
   verifyFormat("template <typename T>\n"
                "concept C = requires(T t) {\n"
@@ -24755,7 +24754,23 @@ TEST_F(FormatTest, AlignRequiresClauseBody) {
                "void bar(T);",
                Style);
 
-  Style.AlignRequiresClauseBody = false;
+  verifyFormat("template <typename T> void f() {\n"
+               "  if constexpr (requires(T t) {\n"
+               "                  { t.bar() } -> std::same_as<bool>;\n"
+               "                }) {\n"
+               "  }\n"
+               "}",
+               Style);
+
+  verifyFormat("template <typename T> struct C {\n"
+               "  void f()\n"
+               "    requires requires(T t) {\n"
+               "               { t.bar() } -> std::same_as<bool>;\n"
+               "             };\n"
+               "};",
+               Style);
+
+  Style.RequiresExpressionIndentation = FormatStyle::REI_OuterScope;
 
   verifyFormat("template <typename T>\n"
                "concept C = requires(T t) {\n"
@@ -24785,6 +24800,22 @@ TEST_F(FormatTest, AlignRequiresClauseBody) {
                "             --t;\n"
                "           }\n"
                "void bar(T);",
+               Style);
+
+  verifyFormat("template <typename T> void f() {\n"
+               "  if constexpr (requires(T t) {\n"
+               "                  { t.bar() } -> std::same_as<bool>;\n"
+               "                }) {\n"
+               "  }\n"
+               "}",
+               Style);
+
+  verifyFormat("template <typename T> struct C {\n"
+               "  void f()\n"
+               "    requires requires(T t) {\n"
+               "      { t.bar() } -> std::same_as<bool>;\n"
+               "    };\n"
+               "};",
                Style);
 }
 
