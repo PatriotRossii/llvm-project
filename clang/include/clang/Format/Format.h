@@ -381,8 +381,7 @@ struct FormatStyle {
     /// \endcode
     REI_Keyword,
     /// Align requires expression body relative to the indentation level of the
-    /// outer scope
-    /// the requires expression resides in.
+    /// outer scope the requires expression resides in.
     /// \code
     ///    template <typename T>
     ///    concept C = requires(T t) {
