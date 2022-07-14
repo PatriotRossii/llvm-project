@@ -369,16 +369,32 @@ struct FormatStyle {
   /// \version 3.5
   OperandAlignmentStyle AlignOperands;
 
-  /// If ``true``, aligns requires clause bodies with `requires` keyword.
-  /// \code
-  ///   true:                                   false:
-  ///   template <typename T>                   template <typename T>
-  ///   concept C = requires(T t) {      vs.    concept C = requires(T t) {
-  ///                 ...                         ...
-  ///               }                           }
-  /// \endcode
+  /// Indentation logic for requires expression bodies.
+  enum RequiresExpressionIndentationKind : int8_t {
+    /// Align requires expression body relative to the `requires` keyword.
+    /// This is the default.
+    /// \code
+    ///    template <typename T>
+    ///    concept C = requires(T t) {
+    ///                  ...
+    ///                }
+    /// \endcode
+    REI_Keyword,
+    /// Align requires expression body relative to the indentation level of the
+    /// outer scope
+    /// the requires expression resides in.
+    /// \code
+    ///    template <typename T>
+    ///    concept C = requires(T t) {
+    ///      ...
+    ///    }
+    /// \endcode
+    REI_OuterScope,
+  };
+
+  /// The indentation used for requires expression bodies.
   /// \version 15
-  bool AlignRequiresClauseBody;
+  RequiresExpressionIndentationKind RequiresExpressionIndentation;
 
   /// If ``true``, aligns trailing comments.
   /// \code
@@ -3867,7 +3883,7 @@ struct FormatStyle {
            AlignConsecutiveMacros == R.AlignConsecutiveMacros &&
            AlignEscapedNewlines == R.AlignEscapedNewlines &&
            AlignOperands == R.AlignOperands &&
-           AlignRequiresClauseBody == R.AlignRequiresClauseBody &&
+           RequiresExpressionIndentation == R.RequiresExpressionIndentation &&
            AlignTrailingComments == R.AlignTrailingComments &&
            AllowAllArgumentsOnNextLine == R.AllowAllArgumentsOnNextLine &&
            AllowAllParametersOfDeclarationOnNextLine ==
