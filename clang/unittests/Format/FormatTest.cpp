@@ -3300,6 +3300,14 @@ TEST_F(FormatTest, UnderstandsAccessSpecifiers) {
                "Q_SIGNALS:\n"
                "  void g2();\n"
                "};");
+  verifyFormat("class A {\n"
+               "public ATTR:\n"
+               "  void f1() {}\n"
+               "protected ATTR:\n"
+               "  void f2() {}\n"
+               "private ATTR:\n"
+               "  void f3() {}\n"
+               "};");
 
   // Don't interpret 'signals' the wrong way.
   verifyFormat("signals.set();");
@@ -3311,6 +3319,21 @@ TEST_F(FormatTest, UnderstandsAccessSpecifiers) {
                "label:\n"
                "  signals.baz();\n"
                "}");
+
+  // Don't interpret 'slots' the wrong way.
+  verifyFormat("struct Bitfields {\n"
+               "  unsigned slots : 1;\n"
+               "};");
+  verifyFormat("slots.set();");
+  verifyFormat("for (Signals slots : f()) {\n}");
+  verifyFormat("{\n"
+               "  slots.set(); // This needs indentation.\n"
+               "}");
+  verifyFormat("void f() {\n"
+               "label:\n"
+               "  slots.baz();\n"
+               "}");
+
   verifyFormat("private[1];");
   verifyFormat("testArray[public] = 1;");
   verifyFormat("public();");
