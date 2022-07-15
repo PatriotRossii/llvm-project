@@ -2088,7 +2088,10 @@ bool UnwrappedLineParser::tryToParseLambda() {
     return false;
   }
   FormatToken &LSquare = *FormatTok;
-  if (!tryToParseLambdaIntroducer())
+
+  bool result = tryToParseLambdaIntroducer();
+  //llvm::errs() << "Try to parse lambda introducer... " << result << '\n';
+  if (!result)
     return false;
 
   bool SeenArrow = false;
@@ -2193,7 +2196,7 @@ bool UnwrappedLineParser::tryToParseLambdaIntroducer() {
   if (Previous &&
       (Previous->isOneOf(tok::identifier, tok::kw_operator, tok::kw_new,
                          tok::kw_delete, tok::l_square) ||
-       LeftSquare->isCppStructuredBinding(Style) || Previous->closesScope() ||
+       LeftSquare->isCppStructuredBinding(Style) ||
        Previous->isSimpleTypeSpecifier())) {
     return false;
   }
