@@ -113,14 +113,14 @@ private:
       } else if (RootToken.isObjCAccessSpecifier()) {
         return true;
       }
-      // Handle Qt signals.
-      else if ((RootToken.isOneOf(Keywords.kw_signals, Keywords.kw_qsignals) &&
-                RootToken.Next && RootToken.Next->is(tok::colon))) {
+      // Handle Qt signals and custom attributes.
+      else if (RootToken.isOneOf(Keywords.kw_signals, Keywords.kw_qsignals) &&
+                RootToken.Next && RootToken.Next->is(tok::colon)) {
         return true;
-      } else if (RootToken.Next &&
-                 RootToken.Next->isOneOf(Keywords.kw_slots,
-                                         Keywords.kw_qslots) &&
-                 RootToken.Next->Next && RootToken.Next->Next->is(tok::colon)) {
+      }
+      else if (RootToken.isAccessSpecifier(/*colonRequired=*/false) &&
+               RootToken.Next && RootToken.Next->isOneOf(Keywords.kw_slots, Keywords.kw_qslots, tok::identifier) &&
+               RootToken.Next->Next && RootToken.Next->Next->is(tok::colon)) {
         return true;
       }
       // Handle malformed access specifier e.g. 'private' without trailing ':'.
