@@ -3088,7 +3088,7 @@ void UnwrappedLineParser::parseAccessSpecifier() {
   if (FormatTok->isOneOf(Keywords.kw_slots, Keywords.kw_qslots))
     nextToken();
   // Handle custom attributes.
-  if(FormatTok->is(tok::identifier) && Tokens->peekNextToken()->is(tok::colon))
+  if (FormatTok->is(tok::identifier) && Tokens->peekNextToken()->is(tok::colon))
     nextToken();
 
   // Otherwise, we don't know what it is, and we'd better keep the next token.
